@@ -34,6 +34,7 @@ tenants:
   - tenant2
   - tenant3
 endpoint: "http://example.com/loki/api/v1/push"
+```
 
 ## Usage
 
@@ -46,7 +47,7 @@ $ go run main.go
 
 Here is an example JSON data:
 
-```
+```json
 {
     "streams": [
         {
