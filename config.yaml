@@ -1,0 +1,13 @@
+labels:
+  - val1
+  - val2
+  - val3
+  - val4
+  - val5
+tenants:
+  - tenant1
+  - tenant2
+  - tenant3
+  - tenant4
+  - tenant5
+endpoint: "http://example.com/loki/api/v1/push"
