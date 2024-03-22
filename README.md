@@ -4,6 +4,15 @@ This is a simple client program written in Go that interacts with the Grafana Lo
 
 It periodically sends log entries to a Grafana Loki instance using the Push API endpoint.
 
+## Tested with Loki Version
+
+This client has been tested with Grafana Loki version 2.9.5.
+
+Test was performed using Loki in scalable mode installed with helm.
+
+- https://grafana.com/docs/loki/latest/setup/install/helm/install-scalable/
+- https://grafana.com/docs/loki/latest/get-started/deployment-modes/#simple-scalable
+
 ## Requirements
 
 - Go programming language installed on your system
