@@ -46,9 +46,14 @@ sleep_interval: 30
 
 ```
 $ go run main.go
-2024/03/22 08:10:05 Response Status: 200 OK, X-Scope-OrgID: tenant3
-2024/03/22 08:10:08 Response Status: 200 OK, X-Scope-OrgID: tenant3
-2024/03/22 08:10:11 Response Status: 200 OK, X-Scope-OrgID: tenant5
+2024/03/22 00:35:12 Response Status: 204 No Content, X-Scope-OrgID: tenant3
+2024/03/22 00:35:42 Response Status: 204 No Content, X-Scope-OrgID: tenant2
+2024/03/22 00:36:12 Response Status: 204 No Content, X-Scope-OrgID: tenant1
+2024/03/22 00:36:42 Response Status: 204 No Content, X-Scope-OrgID: tenant1
+2024/03/22 00:37:12 Response Status: 204 No Content, X-Scope-OrgID: tenant2
+2024/03/22 00:37:42 Response Status: 204 No Content, X-Scope-OrgID: tenant1
+2024/03/22 00:38:12 Response Status: 204 No Content, X-Scope-OrgID: tenant1
+2024/03/22 00:38:42 Response Status: 204 No Content, X-Scope-OrgID: tenant5
 ```
 
 Here is an example JSON data:
