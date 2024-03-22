@@ -21,6 +21,7 @@ You need to provide the following configuration parameters:
 - `labels`: An array of strings representing the labels to be associated with the log entries. These labels will be randomly selected for each log entry.
 - `tenants`: An array of strings representing the X-Scope-OrgID values to be used in the HTTP request headers. One of these values will be randomly selected for each request.
 - `endpoint`: The URL of the Grafana Loki Push API endpoint.
+- `sleep_interval`: interval in seconds between POST to the Grafana Loki Push API endpoint.
 
 Here is an example `config.yaml` file:
 
@@ -29,11 +30,16 @@ labels:
   - val1
   - val2
   - val3
+  - val4
+  - val5
 tenants:
   - tenant1
   - tenant2
   - tenant3
+  - tenant4
+  - tenant5
 endpoint: "http://example.com/loki/api/v1/push"
+sleep_interval: 30
 ```
 
 ## Usage

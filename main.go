@@ -3,8 +3,8 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"log"
 	"fmt"
+	"log"
 	"math/rand"
 	"net/http"
 	"os"
@@ -14,9 +14,10 @@ import (
 )
 
 type Config struct {
-	Labels   []string `yaml:"labels"`
-	Tenants  []string `yaml:"tenants"`
-	Endpoint string   `yaml:"endpoint"`
+	Labels        []string `yaml:"labels"`
+	Tenants       []string `yaml:"tenants"`
+	Endpoint      string   `yaml:"endpoint"`
+	SleepInterval int      `yaml:"sleep_interval"`
 }
 
 type PushRequest struct {
@@ -92,7 +93,7 @@ func main() {
 
 		log.Printf("Response Status: %s, X-Scope-OrgID: %s\n", resp.Status, orgID)
 
-		time.Sleep(3 * time.Second)
+		time.Sleep(time.Duration(config.SleepInterval) * time.Second)
 	}
 }
 

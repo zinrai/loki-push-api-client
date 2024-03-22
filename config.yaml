@@ -11,3 +11,4 @@ tenants:
   - tenant4
   - tenant5
 endpoint: "http://example.com/loki/api/v1/push"
+sleep_interval: 30
