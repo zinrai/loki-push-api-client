@@ -1,1 +1,2 @@
-loki-push-api-client
+/loki-push-api-client
+*.yaml
