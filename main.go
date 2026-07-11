@@ -8,10 +8,8 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
-	"os"
+	"strings"
 	"time"
-
-	"github.com/goccy/go-yaml"
 )
 
 var (
@@ -19,13 +17,6 @@ var (
 	commit  = "none"
 	date    = "unknown"
 )
-
-type Config struct {
-	Labels        []string `yaml:"labels"`
-	Tenants       []string `yaml:"tenants"`
-	Endpoint      string   `yaml:"endpoint"`
-	SleepInterval int      `yaml:"sleep_interval"`
-}
 
 type PushRequest struct {
 	Streams []Stream `json:"streams"`
@@ -40,6 +31,14 @@ type StreamInfo struct {
 	Label string `json:"label"`
 }
 
+func generateNames(prefix string, n int) []string {
+	names := make([]string, n)
+	for i := 0; i < n; i++ {
+		names[i] = fmt.Sprintf("%s%d", prefix, i+1)
+	}
+	return names
+}
+
 func generateRandomString(length int) string {
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	randomString := make([]byte, length)
@@ -50,7 +49,10 @@ func generateRandomString(length int) string {
 }
 
 func main() {
-	configPath := flag.String("config", "config.yaml", "path to the configuration file")
+	endpoint := flag.String("endpoint", "http://localhost:3100/loki/api/v1/push", "Loki push API endpoint")
+	tenantCount := flag.Int("tenants", 5, "number of tenants to generate")
+	labelCount := flag.Int("labels", 5, "number of labels to generate")
+	interval := flag.Duration("interval", 30*time.Second, "interval between requests")
 	showVersion := flag.Bool("version", false, "print version information and exit")
 	flag.Parse()
 
@@ -59,17 +61,21 @@ func main() {
 		return
 	}
 
-	config, err := loadConfig(*configPath)
-	if err != nil {
-		log.Println("Error loading config:", err)
-		return
+	if *tenantCount < 1 || *labelCount < 1 {
+		log.Fatal("tenants and labels must be at least 1")
 	}
+
+	tenants := generateNames("tenant", *tenantCount)
+	labels := generateNames("label", *labelCount)
+
+	fmt.Println("tenants:", strings.Join(tenants, " "))
+	fmt.Println("labels:", strings.Join(labels, " "))
 
 	client := &http.Client{}
 
 	seq := 0
 	for {
-		orgID := config.Tenants[rand.Intn(len(config.Tenants))]
+		orgID := tenants[rand.Intn(len(tenants))]
 
 		var values [][]string
 		for i := 0; i < rand.Intn(10)+1; i++ {
@@ -83,7 +89,7 @@ func main() {
 			Streams: []Stream{
 				{
 					Stream: StreamInfo{
-						Label: config.Labels[rand.Intn(len(config.Labels))],
+						Label: labels[rand.Intn(len(labels))],
 					},
 					Values: values,
 				},
@@ -94,7 +100,7 @@ func main() {
 			return
 		}
 
-		req, err := http.NewRequest("POST", config.Endpoint, bytes.NewBuffer(reqBody))
+		req, err := http.NewRequest("POST", *endpoint, bytes.NewBuffer(reqBody))
 		if err != nil {
 			log.Println("Error creating request:", err)
 			return
@@ -107,26 +113,10 @@ func main() {
 			log.Println("Error sending request:", err)
 			return
 		}
-		defer resp.Body.Close()
+		resp.Body.Close()
 
 		log.Printf("Response Status: %s, X-Scope-OrgID: %s\n", resp.Status, orgID)
 
-		time.Sleep(time.Duration(config.SleepInterval) * time.Second)
+		time.Sleep(*interval)
 	}
-}
-
-func loadConfig(filename string) (Config, error) {
-	var config Config
-	file, err := os.Open(filename)
-	if err != nil {
-		return config, err
-	}
-	defer file.Close()
-
-	decoder := yaml.NewDecoder(file)
-	err = decoder.Decode(&config)
-	if err != nil {
-		return config, err
-	}
-	return config, nil
 }

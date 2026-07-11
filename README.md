@@ -25,67 +25,37 @@ Test was performed using Loki in scalable mode installed with helm.
 - Access to a Grafana Loki instance with `auth_enabled: true`
     - https://grafana.com/docs/loki/latest/configure/#supported-contents-and-default-values-of-lokiyaml
 
-## Configuration
-
-The configuration for this client is done through a YAML file named `config.yaml`.
-
-You need to provide the following configuration parameters:
-
-- `labels`: An array of strings representing the labels to be associated with the log entries. These labels will be randomly selected for each log entry.
-- `tenants`: An array of strings representing the X-Scope-OrgID values to be used in the HTTP request headers. One of these values will be randomly selected for each request.
-- `endpoint`: The URL of the Grafana Loki Push API endpoint.
-- `sleep_interval`: interval in seconds between POST to the Grafana Loki Push API endpoint.
-
-Here is an example `config.yaml` file:
-
-```yaml
-labels:
-  - val1
-  - val2
-  - val3
-  - val4
-  - val5
-tenants:
-  - tenant1
-  - tenant2
-  - tenant3
-  - tenant4
-  - tenant5
-endpoint: "http://example.com/loki/api/v1/push"
-sleep_interval: 30
-```
-
 ## Usage
 
+Point the client at a Loki endpoint and choose how many tenants and labels to spread across:
+
 ```
-$ go run main.go
-2024/03/22 00:35:12 Response Status: 204 No Content, X-Scope-OrgID: tenant3
-2024/03/22 00:35:42 Response Status: 204 No Content, X-Scope-OrgID: tenant2
-2024/03/22 00:36:12 Response Status: 204 No Content, X-Scope-OrgID: tenant1
-2024/03/22 00:36:42 Response Status: 204 No Content, X-Scope-OrgID: tenant1
-2024/03/22 00:37:12 Response Status: 204 No Content, X-Scope-OrgID: tenant2
-2024/03/22 00:37:42 Response Status: 204 No Content, X-Scope-OrgID: tenant1
-2024/03/22 00:38:12 Response Status: 204 No Content, X-Scope-OrgID: tenant1
-2024/03/22 00:38:42 Response Status: 204 No Content, X-Scope-OrgID: tenant5
+$ loki-push-api-client -endpoint http://localhost:3100/loki/api/v1/push -tenants 5 -labels 5 -interval 30s
+tenants: tenant1 tenant2 tenant3 tenant4 tenant5
+labels: label1 label2 label3 label4 label5
+2026/07/12 08:26:16 Response Status: 204 No Content, X-Scope-OrgID: tenant2
+2026/07/12 08:26:17 Response Status: 204 No Content, X-Scope-OrgID: tenant1
 ```
 
-Here is an example JSON data:
+Tenant and label names are generated from the counts and printed at startup, so you know which `X-Scope-OrgID` values to query with logcli. Run with `-help` for the full list of options.
+
+Each pushed log line embeds the tenant it was sent to and a run global sequence number, so a per tenant query can confirm that only that tenant's lines are visible under it:
 
 ```json
 {
     "streams": [
         {
             "stream": {
-                "label": "val5"
+                "label": "label2"
             },
             "values": [
                 [
-                    "1711062608762091837",
-                    "8h9kg44ENf58CgVMaisAosF8uyhhBz"
+                    "1783812376808899720",
+                    "tenant=tenant2 seq=1 MyestiPglkU2hjCkxhf2WZkjwhESdd"
                 ],
                 [
-                    "1711062608762091837",
-                    "I2vyItocBaq03NLCmLxybyA9tXSahu"
+                    "1783812376808904254",
+                    "tenant=tenant2 seq=2 7jnBLlviQze8x7VyEpPnA4p9iIvuBW"
                 ]
             ]
         }
