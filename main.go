@@ -42,10 +42,9 @@ type StreamInfo struct {
 
 func generateRandomString(length int) string {
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	seededRand := rand.New(rand.NewSource(time.Now().UnixNano()))
 	randomString := make([]byte, length)
 	for i := range randomString {
-		randomString[i] = charset[seededRand.Intn(len(charset))]
+		randomString[i] = charset[rand.Intn(len(charset))]
 	}
 	return string(randomString)
 }
@@ -68,14 +67,17 @@ func main() {
 
 	client := &http.Client{}
 
+	seq := 0
 	for {
-		epoch := time.Now().UTC().UnixNano()
+		orgID := config.Tenants[rand.Intn(len(config.Tenants))]
+
 		var values [][]string
 		for i := 0; i < rand.Intn(10)+1; i++ {
-			values = append(values, []string{fmt.Sprintf("%d", epoch), generateRandomString(30)})
+			seq++
+			epoch := time.Now().UTC().UnixNano()
+			line := fmt.Sprintf("tenant=%s seq=%d %s", orgID, seq, generateRandomString(30))
+			values = append(values, []string{fmt.Sprintf("%d", epoch), line})
 		}
-
-		orgID := config.Tenants[rand.Intn(len(config.Tenants))]
 
 		reqBody, err := json.Marshal(PushRequest{
 			Streams: []Stream{
