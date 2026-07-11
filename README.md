@@ -4,6 +4,10 @@ This is a simple client program written in Go that interacts with the Grafana Lo
 
 It periodically sends log entries to a Grafana Loki instance using the Push API endpoint.
 
+## Scope
+
+This client sends log entries directly to Loki, without promtail or Grafana Alloy in the path. Its purpose is to verify that Loki's own multi-tenant separation works, so the client sets the `X-Scope-OrgID` header itself and does not exercise how an agent assigns tenants. For verifying the agent to Loki pipeline, use a promtail or Alloy based setup instead.
+
 ## Tested with Loki Version
 
 This client has been tested with Grafana Loki version 2.9.5.
