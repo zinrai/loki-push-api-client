@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"log"
 	"math/rand"
@@ -10,7 +11,13 @@ import (
 	"os"
 	"time"
 
-	"gopkg.in/yaml.v2"
+	"github.com/goccy/go-yaml"
+)
+
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
 )
 
 type Config struct {
@@ -44,7 +51,16 @@ func generateRandomString(length int) string {
 }
 
 func main() {
-	config, err := loadConfig("config.yaml")
+	configPath := flag.String("config", "config.yaml", "path to the configuration file")
+	showVersion := flag.Bool("version", false, "print version information and exit")
+	flag.Parse()
+
+	if *showVersion {
+		fmt.Printf("version: %s, commit: %s, date: %s\n", version, commit, date)
+		return
+	}
+
+	config, err := loadConfig(*configPath)
 	if err != nil {
 		log.Println("Error loading config:", err)
 		return
